@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Segwik – Universal Checkout Wireframe</title>
+
+<!-- Font Awesome (for lock + icons if needed) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#7b8794;
+    --line:#e7edf5;
+    --accent:#2c7dbf;
+
+    --tab:#8b96a8;
+    --tabActive:#2c7dbf;
+
+    --phone-w:430px;
+    --phone-h:800px;
+    --footer-h:74px;
+    --head-h:56px;
+
+    --radius:18px;
+    --shadow:0 20px 60px rgba(0,0,0,.12),0 8px 16px rgba(0,0,0,.08);
+    --shadow2:0 10px 26px rgba(15,45,86,.08);
+    --shadow3:0 8px 20px rgba(15,45,86,.06);
+
+    --chip:#f5f7fa;
+    --ok:#16a34a;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+  .wrap{display:flex;align-items:center;justify-content:center;min-height:100%;padding:18px}
+
+  /* phone shell */
+  .phone{
+    width:var(--phone-w);
+    height:var(--phone-h);
+    background:#fff;
+    border-radius:34px;
+    box-shadow:var(--shadow);
+    border:8px solid #111;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* screen stack */
+  .screens{position:relative;flex:1;overflow:hidden;background:var(--bg)}
+  .screen{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    transform:translateX(0);
+    opacity:1;
+    transition:transform .35s ease, opacity .35s ease;
+    will-change:transform, opacity;
+  }
+  .screen.hidden{opacity:0;pointer-events:none}
+  .screen.off-right{transform:translateX(100%);opacity:0;pointer-events:none}
+  .screen.off-left{transform:translateX(-12%);opacity:0;pointer-events:none}
+
+  /* topbar */
+  .topbar{
+    height:var(--head-h);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+    position:sticky;top:0;z-index:5;
+  }
+  .topbar .title{
+    font-weight:700;             /* <= 700 */
+    color:var(--accent);
+    font-size:16px;
+    letter-spacing:.2px;
+  }
+  .topbar .backBtn{
+    position:absolute;
+    left:10px;
+    width:36px;height:36px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    display:grid;place-items:center;
+    cursor:pointer;
+    background:#fff;
+    color:#111;
+  }
+  .topbar .backBtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* content area */
+  .content{
+    flex:1;
+    overflow:auto;
+    background:var(--bg);
+    padding:12px 12px calc(var(--footer-h) + 14px);
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+  .content::-webkit-scrollbar{width:0;height:0;display:none}
+
+  /* bottom tabs (dummy icons retained) */
+  .tabs{
+    height:var(--footer-h);
+    border-top:1px solid var(--line);
+    background:#fff;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    padding:6px 6px 8px;
+    position:absolute;
+    bottom:0;left:0;right:0;
+    z-index:6;
+  }
+  .tab{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    color:var(--tab);
+    font-size:11px;
+    font-weight:600; /* <= 700 */
+  }
+  .tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+  .tab.active{color:var(--tabActive);font-weight:700}
+
+  /* cards */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow3);
+    padding:14px;
+    margin:10px 0;
+  }
+  .heroCard{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow2);
+    padding:16px;
+    margin:2px 0 12px;
+  }
+
+  .sectionTitle{
+    font-weight:700; /* <= 700 */
+    font-size:13px;
+    color:#0b1b2b;
+    margin:14px 0 8px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .sectionTitle .dot{width:9px;height:9px;border-radius:999px;background:var(--accent);opacity:.85}
+
+  .mutedLine{
+    color:#64748b;
+    font-size:12px;
+    line-height:1.35;
+    font-weight:600; /* <= 700 */
+  }
+
+  .miniGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+  }
+  .miniGrid.oneCol{grid-template-columns:1fr}
+
+  .miniStat{
+    border:1px solid rgba(44,125,191,.22);
+    border-radius:16px;
+    padding:12px 12px;
+    background:rgba(44,125,191,.06);
+    box-shadow:0 10px 22px rgba(15,45,86,.06);
+  }
+  .miniStat .k{font-size:11px;color:#8a94a6;font-weight:700}
+  .miniStat .v{margin-top:5px;font-size:15px;color:#0b1b2b;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .divider{height:1px;background:var(--line);margin:12px 0}
+
+  /* Buttons */
+  .primaryBtn{
+    width:100%;
+    padding:14px 14px;
+    border-radius:14px;
+    border:0;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700; /* <= 700 */
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 10px 22px rgba(44,125,191,.22);
+    margin-top:12px;
+  }
+  .primaryBtn:active{opacity:.85}
+  .primaryBtn[disabled]{opacity:.55;cursor:not-allowed}
+
+  .secondaryBtn{
+    width:100%;
+    padding:13px 14px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:#111;
+    font-weight:700; /* <= 700 */
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(15,45,86,.06);
+    margin-top:10px;
+  }
+  .secondaryBtn:active{opacity:.88}
+
+  /* Button loader (inline, 2s fake processing) */
+  .primaryBtn{position:relative}
+  .primaryBtn.loading{
+    cursor:not-allowed;
+    opacity:.92;
+  }
+  .primaryBtn.loading .btnText{
+    opacity:0;
+  }
+  .primaryBtn.loading .btnSpinner{
+    opacity:1;
+  }
+  .btnSpinner{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:18px;
+    height:18px;
+    border-radius:999px;
+    border:2px solid rgba(255,255,255,.45);
+    border-top-color:#ffffff;
+    opacity:0;
+    animation:spin .85s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes spin{
+    to{transform:translate(-50%,-50%) rotate(360deg)}
+  }
+
+  /* Payment methods */
+  .method{
+    border:1px solid var(--line);
+    border-radius:20px;
+    background:#fff;
+    box-shadow:var(--shadow3);
+    padding:14px;
+    margin:10px 0;
+    cursor:pointer;
+    position:relative;
+  }
+  .method:hover{border-color:rgba(44,125,191,.32)}
+  .method.active{
+    border-color:rgba(44,125,191,.65);
+    box-shadow:0 14px 26px rgba(44,125,191,.16);
+  }
+
+  .methodTop{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .methodTitle{
+    font-size:14px;
+    font-weight:700; /* <= 700 */
+    color:#0b1b2b;
+    line-height:1.2;
+  }
+  .methodSub{
+    margin-top:6px;
+    font-size:12px;
+    color:#5b6776;
+    font-weight:600; /* <= 700 */
+    line-height:1.35;
+  }
+
+  .radio{
+    width:22px;height:22px;border-radius:999px;
+    border:2px solid #cbd5e1;
+    display:grid;place-items:center;
+    flex:0 0 auto;
+    margin-top:2px;
+  }
+  .method.active .radio{border-color:rgba(44,125,191,.75)}
+  .radio .dot{
+    width:10px;height:10px;border-radius:999px;background:transparent;
+  }
+  .method.active .radio .dot{background:var(--accent)}
+
+  /* Security note */
+  .securityNote{
+    margin-top:12px;
+    border:1px solid rgba(44,125,191,.18);
+    background:rgba(44,125,191,.06);
+    border-radius:16px;
+    padding:12px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .secIcon{
+    width:34px;height:34px;
+    border-radius:12px;
+    display:grid;place-items:center;
+    background:rgba(44,125,191,.12);
+    border:1px solid rgba(44,125,191,.20);
+    color:var(--accent);
+    flex:0 0 auto;
+  }
+  .secTitle{font-weight:700;color:#0b1b2b;font-size:13px;line-height:1.2}
+  .secText{margin-top:5px;color:#5b6776;font-size:12px;font-weight:600;line-height:1.35}
+
+  /* Credit card form (more “real” look) */
+  .payShell{
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:12px;
+    background:#fff;
+    box-shadow:0 10px 22px rgba(15,45,86,.05);
+  }
+  .row{display:flex;gap:10px}
+  .row + .row{margin-top:10px}
+  .col{flex:1;min-width:0}
+
+  .label{
+    font-size:11px;
+    color:#8a94a6;
+    font-weight:700;
+    letter-spacing:.2px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .hintPill{
+    font-size:10px;
+    font-weight:700;
+    color:#556274;
+    background:var(--chip);
+    border:1px solid rgba(15,45,86,.10);
+    padding:4px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  .ccField{
+    width:100%;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:14px;
+    padding:12px 12px;
+    font-size:14px;
+    font-weight:500;
+    outline:none;
+  }
+  .ccField:focus{
+    border-color:rgba(44,125,191,.55);
+    box-shadow:0 0 0 3px rgba(44,125,191,.10);
+  }
+
+  .ccNumberWrap{position:relative}
+  .brandStrip{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    display:flex;
+    gap:8px;
+    align-items:center;
+    pointer-events:none;
+  }
+
+  /* Card brand logos (pure CSS, realistic-ish) */
+  .brandLogo{
+    width:34px;
+    height:22px;
+    border-radius:6px;
+    border:1px solid rgba(15,45,86,.12);
+    background:#ffffff;
+    box-shadow:0 6px 14px rgba(15,45,86,.08);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .brandLogo.visa{
+    background:linear-gradient(135deg,#0b2a6f 0%, #123a92 55%, #0b2a6f 100%);
+  }
+  .brandLogo.visa:after{
+    content:"VISA";
+    position:absolute;
+    right:6px;
+    bottom:4px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.6px;
+    color:#ffffff;
+    opacity:.95;
+  }
+
+  .brandLogo.mc{
+    background:#ffffff;
+  }
+  .brandLogo.mc:before,
+  .brandLogo.mc:after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    transform:translateY(-50%);
+    opacity:.96;
+  }
+  .brandLogo.mc:before{
+    left:9px;
+    background:#eb001b;
+  }
+  .brandLogo.mc:after{
+    left:15px;
+    background:#f79e1b;
+    mix-blend-mode:multiply;
+  }
+
+  .brandLogo.amex{
+    background:linear-gradient(135deg,#0b8bbd 0%, #0a6fa1 55%, #0b8bbd 100%);
+  }
+  .brandLogo.amex:after{
+    content:"AMEX";
+    position:absolute;
+    left:6px;
+    bottom:4px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.5px;
+    color:#ffffff;
+    opacity:.95;
+  }
+  .brandLogo.amex:before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.08) 0px,
+      rgba(255,255,255,.08) 2px,
+      rgba(255,255,255,0) 2px,
+      rgba(255,255,255,0) 4px
+    );
+    opacity:.55;
+  }
+
+  .brandLogo.disc{
+    background:#ffffff;
+  }
+  .brandLogo.disc:before{
+    content:"";
+    position:absolute;
+    left:-6px;
+    top:50%;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    transform:translateY(-50%);
+    background:radial-gradient(circle at 45% 45%, #ff9a2a 0%, #ff6a00 60%, rgba(255,106,0,0) 62%);
+    opacity:.95;
+  }
+  .brandLogo.disc:after{
+    content:"DISC";
+    position:absolute;
+    right:6px;
+    bottom:4px;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.45px;
+    color:#111827;
+    opacity:.85;
+  }
+
+
+  .inlineInfo{
+    margin-top:10px;
+    padding:10px 10px;
+    border-radius:14px;
+    background:rgba(15,45,86,.04);
+    border:1px solid rgba(15,45,86,.08);
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .inlineInfo .i{
+    width:28px;height:28px;border-radius:10px;
+    background:rgba(44,125,191,.10);
+    border:1px solid rgba(44,125,191,.18);
+    color:var(--accent);
+    display:grid;place-items:center;
+    flex:0 0 auto;
+    font-size:13px;
+  }
+  .inlineInfo .t{
+    font-size:12px;
+    color:#556274;
+    font-weight:600;
+    line-height:1.35;
+  }
+
+  .nonInteractiveBtn{
+    width:100%;
+    padding:14px 14px;
+    border-radius:14px;
+    border:1px solid rgba(15,45,86,.10);
+    background:#f8fafc;
+    color:#0b1b2b;
+    font-weight:700;
+    font-size:15px;
+    box-shadow:0 8px 18px rgba(15,45,86,.05);
+    margin-top:12px;
+    cursor:not-allowed;
+  }
+
+  /* Toast */
+  .toast{
+    position:absolute;
+    left:12px;right:12px;bottom:calc(var(--footer-h) + 12px);
+    background:#0b1b2b;
+    color:#fff;
+    padding:12px 12px;
+    border-radius:16px;
+    font-size:13px;
+    font-weight:600;
+    box-shadow:0 18px 40px rgba(0,0,0,.18);
+    opacity:0;
+    transform:translateY(12px);
+    transition:opacity .22s ease, transform .22s ease;
+    pointer-events:none;
+    z-index:10;
+  }
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  @media (max-width:460px){
+    :root{--phone-w:100vw;--phone-h:100vh}
+    .wrap{padding:0}
+    .phone{border-radius:0;border:0;width:100vw;height:100vh}
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="phone">
+    <div class="screens">
+
+      <!-- Screen 1: Choose method -->
+      <div class="screen" id="screen-method">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Choose Payment Method</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Select a payment option</div>
+            <div class="mutedLine" style="margin-top:8px;">
+              Choose how you’d like to pay. You’ll enter details on the next step.
+            </div>
+
+            <!-- PURPOSE REMOVED: total occupies full width -->
+            <div class="miniGrid oneCol">
+              <div class="miniStat">
+                <div class="k">Total due today</div>
+                <div class="v" id="sumTotal">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionTitle" style="margin-top:8px;"><span class="dot"></span>Payment methods</div>
+
+          <div class="method" id="m-card" onclick="selectMethod('card')">
+            <div class="methodTop">
+              <div style="min-width:0;">
+                <div class="methodTitle">Credit / Debit Card</div>
+                <div class="methodSub">Visa, Mastercard, American Express, Discover.</div>
+              </div>
+              <div class="radio" aria-hidden="true"><div class="dot"></div></div>
+            </div>
+          </div>
+
+          <div class="method" id="m-apple" onclick="selectMethod('apple')">
+            <div class="methodTop">
+              <div style="min-width:0;">
+                <div class="methodTitle">Apple Pay</div>
+                <div class="methodSub">Connect Apple Pay to Segwik to enable wallet checkout.</div>
+              </div>
+              <div class="radio" aria-hidden="true"><div class="dot"></div></div>
+            </div>
+          </div>
+
+          <div class="method" id="m-google" onclick="selectMethod('google')">
+            <div class="methodTop">
+              <div style="min-width:0;">
+                <div class="methodTitle">Google Pay</div>
+                <div class="methodSub">Connect Google Pay to Segwik to enable wallet checkout.</div>
+              </div>
+              <div class="radio" aria-hidden="true"><div class="dot"></div></div>
+            </div>
+          </div>
+
+          <div class="method" id="m-paypal" onclick="selectMethod('paypal')">
+            <div class="methodTop">
+              <div style="min-width:0;">
+                <div class="methodTitle">PayPal</div>
+                <div class="methodSub">Use PayPal for checkout. You may be redirected to complete payment.</div>
+              </div>
+              <div class="radio" aria-hidden="true"><div class="dot"></div></div>
+            </div>
+          </div>
+
+          <div class="method" id="m-ach" onclick="selectMethod('ach')">
+            <div class="methodTop">
+              <div style="min-width:0;">
+                <div class="methodTitle">Bank transfer (ACH)</div>
+                <div class="methodSub">Common for business payments and invoices.</div>
+              </div>
+              <div class="radio" aria-hidden="true"><div class="dot"></div></div>
+            </div>
+          </div>
+
+          <button class="primaryBtn" id="methodContinue" onclick="goToSelected()" disabled>Continue</button>
+          <button class="secondaryBtn" onclick="toast('Not saved');">Cancel</button>
+
+          <div class="securityNote" role="note" aria-label="Security note">
+            <div class="secIcon" aria-hidden="true">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <div style="min-width:0;">
+              <div class="secTitle">Secure payment</div>
+              <div class="secText">
+                Payment details are encrypted and stored securely.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Card (more realistic layout + components) -->
+      <div class="screen off-right hidden" id="screen-card" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Pay by Card</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Enter card details</div>
+            <div class="mutedLine" style="margin-top:8px;">This is a wireframe-style card entry step.</div>
+
+            <div class="miniGrid oneCol" style="margin-top:12px;">
+              <div class="miniStat">
+                <div class="k">Due today</div>
+                <div class="v" id="cardDue">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sectionTitle" style="margin-top:0;"><span class="dot"></span>Card information</div>
+
+            <div class="payShell">
+              <!-- CARD NUMBER -->
+              <div class="label" style="margin-bottom:6px;">
+                <span>Card number</span>
+              </div>
+              <div class="ccNumberWrap">
+                <input class="ccField" id="ccNumber" inputmode="numeric" autocomplete="cc-number" placeholder="1234 1234 1234 1234" />
+                <div class="brandStrip" aria-hidden="true">
+                  <div class="brandLogo visa" title="Visa"></div>
+                  <div class="brandLogo mc" title="Mastercard"></div>
+                  <div class="brandLogo amex" title="American Express"></div>
+                  <div class="brandLogo disc" title="Discover"></div>
+                </div>
+
+              </div>
+
+              <!-- EXP + CVC -->
+              <div class="row" style="margin-top:10px;">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Expiration</span>
+                  </div>
+                  <input class="ccField" id="ccExp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY" />
+                </div>
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Security code</span>
+                  </div>
+                  <input class="ccField" id="ccCvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" />
+                </div>
+              </div>
+
+              <!-- NAME -->
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Name on card</span>
+                  </div>
+                  <input class="ccField" id="ccName" autocomplete="cc-name" placeholder="Name" />
+                </div>
+              </div>
+
+              <!-- ZIP / COUNTRY (realistic checkout element) -->
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Billing ZIP / Postal code</span>
+                  </div>
+                  <input class="ccField" id="ccZip" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP / Postal code" />
+                </div>
+              </div>
+
+              <!-- RECEIPT EMAIL -->
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Receipt email</span>
+                  </div>
+                  <input class="ccField" id="ccEmail" inputmode="email" autocomplete="email" placeholder="you@company.com" />
+                </div>
+              </div>
+
+              <div class="inlineInfo">
+                <div class="i" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="t">
+                  Your card details are protected with encryption and tokenization. We store a secure payment method for future charges and renewals.
+                </div>
+              </div>
+            </div>
+
+            <button class="primaryBtn" id="cardPayBtn" onclick="fakePayToSuccess('cardPayBtn')">
+              <span class="btnText">Pay now</span>
+              <span class="btnSpinner" aria-hidden="true"></span>
+            </button>
+            <button class="secondaryBtn" onclick="navBack()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3: Apple Pay (non-clickable placeholder) -->
+      <div class="screen off-right hidden" id="screen-apple" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Apple Pay</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Apple Pay setup</div>
+            <div class="mutedLine" style="margin-top:8px;">
+              Connect Apple Pay to Segwik to enable wallet checkout on supported devices.
+            </div>
+
+            <div class="miniGrid oneCol" style="margin-top:12px;">
+              <div class="miniStat">
+                <div class="k">Due today</div>
+                <div class="v" id="appleDue">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sectionTitle" style="margin-top:0;"><span class="dot"></span>Wallet checkout</div>
+            <div class="mutedLine">
+              When enabled, Segwik will present the Apple Pay sheet during checkout.
+            </div>
+
+            <button class="primaryBtn" id="applePayBtn" onclick="fakePayToSuccess('applePayBtn')">
+              <span class="btnText">Pay with Apple Pay</span>
+              <span class="btnSpinner" aria-hidden="true"></span>
+            </button>
+
+
+            <button class="secondaryBtn" onclick="navBack()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 4: Google Pay (non-clickable placeholder) -->
+      <div class="screen off-right hidden" id="screen-google" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Google Pay</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Google Pay setup</div>
+            <div class="mutedLine" style="margin-top:8px;">
+              Connect Google Pay to Segwik to enable wallet checkout.
+            </div>
+
+            <div class="miniGrid oneCol" style="margin-top:12px;">
+              <div class="miniStat">
+                <div class="k">Due today</div>
+                <div class="v" id="googleDue">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sectionTitle" style="margin-top:0;"><span class="dot"></span>Wallet checkout</div>
+            <div class="mutedLine">
+              When enabled, Segwik will present the Google Pay sheet during checkout.
+            </div>
+
+            <button class="primaryBtn" id="googlePayBtn" onclick="fakePayToSuccess('googlePayBtn')">
+              <span class="btnText">Pay with Google Pay</span>
+              <span class="btnSpinner" aria-hidden="true"></span>
+            </button>
+
+
+            <button class="secondaryBtn" onclick="navBack()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 5: PayPal (realistic: redirect + connect concept, no dummy functionality) -->
+      <div class="screen off-right hidden" id="screen-paypal" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">PayPal</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Pay with PayPal</div>
+            <div class="mutedLine" style="margin-top:8px;">
+              You’ll typically be redirected to PayPal to approve the payment and then returned to Segwik.
+            </div>
+
+            <div class="miniGrid oneCol" style="margin-top:12px;">
+              <div class="miniStat">
+                <div class="k">Due today</div>
+                <div class="v" id="paypalDue">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sectionTitle" style="margin-top:0;"><span class="dot"></span>How it works</div>
+
+            <div class="mutedLine">
+              - Select PayPal to continue.<br>
+              - Segwik sends you to PayPal to sign in and approve.<br>
+              - PayPal returns you to Segwik after approval.
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="sectionTitle" style="margin:0 0 8px;"><span class="dot"></span>Optional: connect PayPal</div>
+            <div class="mutedLine">
+              You can save PayPal as a checkout option for faster payment next time (availability depends on your plan and device).
+            </div>
+
+            <button class="primaryBtn" id="paypalBtn" onclick="fakePayToSuccess('paypalBtn')">
+              <span class="btnText">Continue to PayPal</span>
+              <span class="btnSpinner" aria-hidden="true"></span>
+            </button>
+
+
+            <button class="secondaryBtn" onclick="navBack()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 6: ACH (keep as form; “Authorize” action is placeholder only) -->
+      <div class="screen off-right hidden" id="screen-ach" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Bank transfer (ACH)</div>
+        </div>
+
+        <div class="content">
+          <div class="heroCard">
+            <div style="font-size:15px;font-weight:700;color:#0b1b2b;">Authorize a bank payment</div>
+            <div class="mutedLine" style="margin-top:8px;">This reflects a typical ACH authorization step.</div>
+
+            <div class="miniGrid oneCol" style="margin-top:12px;">
+              <div class="miniStat">
+                <div class="k">Due today</div>
+                <div class="v" id="achDue">$0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="sectionTitle" style="margin-top:0;"><span class="dot"></span>Bank details</div>
+
+            <div class="payShell">
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Account holder</span>
+                  </div>
+                  <input class="ccField" id="achName" placeholder="Name" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Routing number</span>
+                  </div>
+                  <input class="ccField" id="achRouting" inputmode="numeric" placeholder="Routing number" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="label" style="margin-bottom:6px;">
+                    <span>Account number</span>
+                  </div>
+                  <input class="ccField" id="achAccount" inputmode="numeric" placeholder="Account number" />
+                </div>
+              </div>
+
+              <div class="inlineInfo">
+                <div class="i" aria-hidden="true"><i class="fa-solid fa-circle-info"></i></div>
+                <div class="t">
+                  ACH payments may take 1–3 business days to settle, depending on the processor and bank.
+                </div>
+              </div>
+            </div>
+
+            <button class="primaryBtn" id="achAuthorizeBtn" onclick="fakePayToSuccess('achAuthorizeBtn')">
+              <span class="btnText">Authorize bank transfer</span>
+              <span class="btnSpinner" aria-hidden="true"></span>
+            </button>
+            <button class="secondaryBtn" onclick="navBack()">Back</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 7: Payment confirmed (EMPTY placeholder for now) -->
+      <div class="screen off-right hidden" id="screen-success" aria-hidden="true">
+        <div class="topbar">
+          <div class="backBtn" onclick="navBack()">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </div>
+          <div class="title">Confirmation</div>
+        </div>
+
+        <div class="content">
+          <!-- intentionally empty for now -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- bottom tabs -->
+    <div class="tabs" id="tabs">
+      <div class="tab active">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5l9-7 9 7"/><path d="M9 22V12h6v10"/></svg>
+        Home
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3z"/><path d="M8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3z"/><path d="M8 13c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13z"/><path d="M16 13c-.29 0-.62.02-1 .05 1.16.84 2 1.94 2 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Contacts
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"/><path d="M8 2v4M16 2v4"/><path d="M7 10h10M7 14h10"/></svg>
+        My Card
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/></svg>
+        Scan Card
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+        More
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+  /* -----------------------
+     Universal checkout state
+  ------------------------ */
+  const checkout = {
+    totalDueToday: 139,      // dummy amount (edit freely)
+    selectedMethod: null
+  };
+
+  function byId(id){ return document.getElementById(id); }
+
+  /* ---------- Toast ---------- */
+  let toastTimer = null;
+  function toast(msg){
+    const el = byId("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> el.classList.remove("show"), 1600);
+  }
+
+  /* ---------- Navigation ---------- */
+  const stack = ["screen-method"];
+
+  function navTo(id){
+    const fromId = stack[stack.length - 1];
+    if(fromId === id) return;
+
+    const from = byId(fromId);
+    const to = byId(id);
+
+    const toContent = to.querySelector(".content");
+    if(toContent) toContent.scrollTop = 0;
+
+    to.classList.remove("hidden");
+    to.classList.add("off-right");
+
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      from.classList.add("off-left");
+      to.classList.remove("off-right");
+    }));
+
+    setTimeout(()=>{
+      from.classList.add("hidden");
+      from.classList.remove("off-left");
+    }, 360);
+
+    stack.push(id);
+  }
+
+  function navBack(){
+    if(stack.length <= 1) return;
+
+    const fromId = stack.pop();
+    const toId = stack[stack.length - 1];
+
+    const from = byId(fromId);
+    const to = byId(toId);
+
+    to.classList.remove("hidden");
+    to.classList.remove("off-left","off-right");
+
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      from.classList.add("off-right");
+    }));
+
+    setTimeout(()=>{
+      from.classList.add("hidden");
+      from.classList.remove("off-right");
+    }, 360);
+  }
+
+  /* ---------- Method selection ---------- */
+  function selectMethod(which){
+    checkout.selectedMethod = which;
+
+    ["card","apple","google","paypal","ach"].forEach(x=>{
+      const el = byId("m-"+x);
+      if(!el) return;
+      el.classList.toggle("active", x === which);
+    });
+
+    const btn = byId("methodContinue");
+    if(btn) btn.disabled = !checkout.selectedMethod;
+  }
+
+  function goToSelected(){
+    if(!checkout.selectedMethod){
+      toast("Choose a payment method.");
+      return;
+    }
+    const map = {
+      card: "screen-card",
+      apple: "screen-apple",
+      google: "screen-google",
+      paypal: "screen-paypal",
+      ach: "screen-ach"
+    };
+    navTo(map[checkout.selectedMethod] || "screen-card");
+  }
+
+  function money(n){
+    const x = Number(n || 0);
+    return "$" + x.toFixed(0);
+  }
+
+  /* ---------- Fake payment (inline loader -> success screen) ---------- */
+  function fakePayToSuccess(btnId){
+    const btn = byId(btnId);
+    if(!btn) return;
+
+    /* prevent double-click */
+    if(btn.classList.contains("loading")) return;
+
+    btn.classList.add("loading");
+    btn.disabled = true;
+
+    setTimeout(()=>{
+      btn.classList.remove("loading");
+      btn.disabled = false;
+      navTo("screen-success");
+    }, 2000);
+  }
+
+  /* ---------- Init ---------- */
+  (function init(){
+    byId("sumTotal").textContent = money(checkout.totalDueToday);
+
+    byId("cardDue").textContent = money(checkout.totalDueToday);
+    byId("appleDue").textContent = money(checkout.totalDueToday);
+    byId("googleDue").textContent = money(checkout.totalDueToday);
+    byId("paypalDue").textContent = money(checkout.totalDueToday);
+    byId("achDue").textContent = money(checkout.totalDueToday);
+  })();
+</script>
+</body>
+</html>
